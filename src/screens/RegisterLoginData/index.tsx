@@ -17,6 +17,8 @@ import {
   Form
 } from './styles';
 
+import { LoginListDataProps } from '../Home';
+
 interface FormData {
   service_name: string;
   email: string;
@@ -50,6 +52,22 @@ export function RegisterLoginData() {
     const dataKey = '@savepass:logins';
 
     // Save data on AsyncStorage and navigate to 'Home' screen
+    try {
+      const loginsStorage = await AsyncStorage.getItem(dataKey);
+
+      const oldLogins = JSON.parse(loginsStorage) as LoginListDataProps;
+
+      const loginsUpdate = [
+        ...oldLogins,
+        newLoginData
+      ];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(loginsUpdate ));
+  
+      navigate('Home');
+    } catch (error) {
+      throw new Error(error.message);
+    }
   }
 
   return (
@@ -66,8 +84,7 @@ export function RegisterLoginData() {
             title="Nome do serviço"
             name="service_name"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.service_name && errors.service_name.message
             }
             control={control}
             autoCapitalize="sentences"
@@ -78,8 +95,7 @@ export function RegisterLoginData() {
             title="E-mail"
             name="email"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.email && errors.email.message
             }
             control={control}
             autoCorrect={false}
@@ -91,8 +107,7 @@ export function RegisterLoginData() {
             title="Senha"
             name="password"
             error={
-              // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message
             }
             control={control}
             secureTextEntry

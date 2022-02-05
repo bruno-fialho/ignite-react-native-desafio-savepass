@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFocusEffect } from '@react-navigation/native';
 
@@ -21,7 +21,7 @@ interface LoginDataProps {
   password: string;
 }
 
-type LoginListDataProps = LoginDataProps[];
+export type LoginListDataProps = LoginDataProps[];
 
 export function Home() {
   const [searchText, setSearchText] = useState('');
@@ -30,15 +30,28 @@ export function Home() {
 
   async function loadData() {
     const dataKey = '@savepass:logins';
+
     // Get asyncStorage data, use setSearchListData and setData
+    const loginsStorage = await AsyncStorage.getItem(dataKey);
+
+    if (loginsStorage) {
+      const loginsData = JSON.parse(loginsStorage) as LoginListDataProps;
+
+      setSearchListData(loginsData);
+      setData(loginsData);
+    }
   }
 
   function handleFilterLoginData() {
     // Filter results inside data, save with setSearchListData
+    const filteredData = data.filter((login) => login.service_name.includes(searchText));
+
+    setSearchListData(filteredData);
   }
 
   function handleChangeInputText(text: string) {
     // Update searchText value
+    setSearchText(text);
   }
 
   useFocusEffect(useCallback(() => {
@@ -49,8 +62,8 @@ export function Home() {
     <>
       <Header
         user={{
-          name: 'Rocketseat',
-          avatar_url: 'https://i.ibb.co/ZmFHZDM/rocketseat.jpg'
+          name: 'Bruno',
+          avatar_url: 'https://avatars.githubusercontent.com/u/45835631?v=4'
         }}
       />
       <Container>
